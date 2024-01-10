@@ -10,7 +10,7 @@ const filterUserForClient = (user: User) => {
   return {
     id: user.id,
     imageUrl: user.imageUrl,
-    email: user.emailAddresses.at(0) || null,
+    email: null ?? user.emailAddresses.at(0),
     fullName: user.firstName + " " + user.lastName,
   };
 };
