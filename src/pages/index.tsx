@@ -48,7 +48,6 @@ const PostView = (props: PostWithUser) => {
         <div className="flex">
           <span className="font-semibold text-white">{author.fullName}</span>
           <span className="ps-1 text-slate-400">{author.email}</span>
-          {/*TODO: If time diff > 24h show as Date else show as 23h*/}
           <span className="ps-1 text-slate-400">{`· ${dayjs(
             post.createdAt,
           ).fromNow()}`}</span>
