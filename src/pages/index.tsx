@@ -1,4 +1,5 @@
-import { RouterOutputs, api } from " /utils/api";
+import type { RouterOutputs } from " /utils/api";
+import { api } from " /utils/api";
 import { SignInButton, useUser } from "@clerk/nextjs";
 import Head from "next/head";
 
@@ -16,7 +17,7 @@ const CreatePostWizard = () => {
   const { mutate, isLoading: isPosting } = api.post.create.useMutation({
     onSuccess: () => {
       setInput("");
-      ctx.post.getAll.invalidate();
+      void ctx.post.getAll.invalidate();
     },
   });
 
