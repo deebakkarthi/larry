@@ -90,7 +90,7 @@ const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
 
   return next({
     ctx: {
-      session: ctx.userId,
+      userId: ctx.userId,
     },
   });
 });

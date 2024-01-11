@@ -15,7 +15,7 @@ model Post {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
 
-    content  String
+    content  String @db.VarChar(280)
     authorId String
 
     @@index([authorId])
