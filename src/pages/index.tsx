@@ -5,6 +5,7 @@ import Head from "next/head";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
+import { LoadingPage } from " /components/loading";
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
@@ -58,9 +59,27 @@ const PostView = (props: PostWithUser) => {
   );
 };
 
+const Feed = () => {
+  const { data, isLoading: postsLoading } = api.post.getAll.useQuery();
+  if (postsLoading) return <LoadingPage />;
+  if (!data) return <div>Something went wrong</div>;
+
+  return (
+    <div className="flex flex-col">
+      {data?.map((fullPost) => (
+        <PostView {...fullPost} key={fullPost.post.id} />
+      ))}
+    </div>
+  );
+};
+
 const Home = () => {
-  const user = useUser();
-  const { data } = api.post.getAll.useQuery();
+  const { isLoaded: userLoaded, isSignedIn } = useUser();
+
+  // Start fetching asap. The Feed component can use the cached result
+  api.post.getAll.useQuery();
+
+  if (!userLoaded) return <div />;
 
   return (
     <>
@@ -71,19 +90,14 @@ const Home = () => {
       <main className="flex  h-screen justify-center">
         <div className="h-full w-full border-x border-slate-500  md:max-w-2xl">
           <div className="flex border-b border-slate-500 p-4">
-            {!user.isSignedIn && (
+            {!isSignedIn && (
               <div className="flex justify-center">
                 <SignInButton />
               </div>
             )}
-
-            {user.isSignedIn && <CreatePostWizard />}
+            {isSignedIn && <CreatePostWizard />}
           </div>
-          <div className="flex flex-col">
-            {data?.map((fullPost) => (
-              <PostView {...fullPost} key={fullPost.post.id} />
-            ))}
-          </div>
+          <Feed />
         </div>
       </main>
     </>
