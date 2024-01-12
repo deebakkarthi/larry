@@ -10,6 +10,7 @@ import { LoadingPage, LoadingSpinner } from " /components/loading";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import ReactTextareaAutosize from "react-textarea-autosize";
+import Link from "next/link";
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
@@ -80,11 +81,17 @@ const PostView = (props: PostWithUser) => {
       />
       <div className="flex flex-col">
         <div className="flex">
-          <span className="font-semibold text-white">{author.fullName}</span>
-          <span className="ps-1 text-slate-400">{author.email}</span>
-          <span className="ps-1 text-slate-400">{`· ${dayjs(
-            post.createdAt,
-          ).fromNow()}`}</span>
+          <Link href={`/@${author.email}`}>
+            <span className="font-semibold text-white">{author.fullName}</span>
+          </Link>
+          <Link href={`/@${author.email}`}>
+            <span className="ps-1 text-slate-400">{author.email}</span>
+          </Link>
+          <Link href={`/post/${post.id}`}>
+            <span className="ps-1 text-slate-400">{`· ${dayjs(
+              post.createdAt,
+            ).fromNow()}`}</span>
+          </Link>
         </div>
         <span>{post.content}</span>
       </div>
