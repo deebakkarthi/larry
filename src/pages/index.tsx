@@ -11,6 +11,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import ReactTextareaAutosize from "react-textarea-autosize";
 import Link from "next/link";
+import { PageLayout } from " /components/layout";
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
@@ -81,10 +82,10 @@ const PostView = (props: PostWithUser) => {
       />
       <div className="flex flex-col">
         <div className="flex">
-          <Link href={`/@${author.email}`}>
+          <Link href={`/${author.email}`}>
             <span className="font-semibold text-white">{author.fullName}</span>
           </Link>
-          <Link href={`/@${author.email}`}>
+          <Link href={`/${author.email}`}>
             <span className="ps-1 text-slate-400">{author.email}</span>
           </Link>
           <Link href={`/post/${post.id}`}>
@@ -127,19 +128,17 @@ const Home = () => {
         <title>Home/Larry</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex  h-full justify-center">
-        <div className="h-full w-full border-x border-slate-500  md:max-w-2xl">
-          <div className="flex border-b border-slate-500 p-4">
-            {!isSignedIn && (
-              <div className="flex justify-center">
-                <SignInButton />
-              </div>
-            )}
-            {isSignedIn && <CreatePostWizard />}
-          </div>
-          <Feed />
+      <PageLayout>
+        <div className="flex border-b border-slate-500 p-4">
+          {!isSignedIn && (
+            <div className="flex justify-center">
+              <SignInButton />
+            </div>
+          )}
+          {isSignedIn && <CreatePostWizard />}
         </div>
-      </main>
+        <Feed />
+      </PageLayout>
     </>
   );
 };

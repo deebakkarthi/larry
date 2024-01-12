@@ -6,11 +6,11 @@ import {
   publicProcedure,
 } from " /server/api/trpc";
 import { clerkClient } from "@clerk/nextjs";
-import type { User } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 
 import { Ratelimit } from "@upstash/ratelimit"; // for deno: see above
 import { Redis } from "@upstash/redis"; // see below for cloudflare and fastly adapters
+import { filterUserForClient } from " /server/helpers/filterUserForClient";
 
 // Create a new ratelimiter, that allows 3 requests per 1 minute
 const ratelimit = new Ratelimit({
@@ -18,15 +18,6 @@ const ratelimit = new Ratelimit({
   limiter: Ratelimit.slidingWindow(3, "1 m"),
   analytics: true,
 });
-
-const filterUserForClient = (user: User) => {
-  return {
-    id: user.id,
-    imageUrl: user.imageUrl,
-    email: null ?? user.emailAddresses.at(0),
-    fullName: user.firstName + " " + user.lastName,
-  };
-};
 
 export const postRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -55,12 +46,10 @@ export const postRouter = createTRPCRouter({
           code: "INTERNAL_SERVER_ERROR",
           message: "Author email not found",
         });
+
       return {
         post,
-        author: {
-          ...author,
-          email: author.email.emailAddress,
-        },
+        author: { ...author, email: author.email },
       };
     });
   }),
