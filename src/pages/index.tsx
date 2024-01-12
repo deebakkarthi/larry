@@ -6,8 +6,10 @@ import Head from "next/head";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
-import { LoadingPage } from " /components/loading";
+import { LoadingPage, LoadingSpinner } from " /components/loading";
 import { useState } from "react";
+import toast from "react-hot-toast";
+import ReactTextareaAutosize from "react-textarea-autosize";
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
@@ -17,7 +19,16 @@ const CreatePostWizard = () => {
   const { mutate, isLoading: isPosting } = api.post.create.useMutation({
     onSuccess: () => {
       setInput("");
+      // used void to ignore the promise
       void ctx.post.getAll.invalidate();
+    },
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+      if (errorMessage?.[0]) {
+        toast.error(errorMessage[0]);
+      } else {
+        toast.error("Failed to post! Please try again later.");
+      }
     },
   });
 
@@ -35,15 +46,21 @@ const CreatePostWizard = () => {
         width={40}
         height={40}
       />
-      <input
+      <ReactTextareaAutosize
         placeholder="What is happening?!"
-        className="grow bg-transparent outline-none"
-        type="text"
+        className="grow resize-none bg-transparent text-xl outline-none"
         value={input}
         onChange={(e) => setInput(e.target.value)}
         disabled={isPosting}
-      ></input>
-      <button onClick={() => mutate({ content: input })}>Post</button>
+      ></ReactTextareaAutosize>
+      {input !== "" && !isPosting && (
+        <button onClick={() => mutate({ content: input })}>Post</button>
+      )}
+      {isPosting && (
+        <div className="flex flex-col justify-center">
+          <LoadingSpinner size={20} />
+        </div>
+      )}
     </div>
   );
 };
@@ -103,7 +120,7 @@ const Home = () => {
         <title>Home/Larry</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex  h-screen justify-center">
+      <main className="flex  h-full justify-center">
         <div className="h-full w-full border-x border-slate-500  md:max-w-2xl">
           <div className="flex border-b border-slate-500 p-4">
             {!isSignedIn && (
