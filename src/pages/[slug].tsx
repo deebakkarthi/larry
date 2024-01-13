@@ -7,23 +7,23 @@ import { db } from " /server/db";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { PageLayout } from " /components/layout";
 import Image from "next/image";
+import { LoadingPage } from " /components/loading";
+import { PostView } from " /components/postview";
 
-export const getStaticProps: GetStaticProps = async (context) => {
-  const ssg = createServerSideHelpers({
-    router: appRouter,
-    ctx: { db: db, userId: null },
-    transformer: superjson,
+const ProfileFeed = (props: { userId: string }) => {
+  const { data, isLoading } = api.post.getPostsByUserId.useQuery({
+    userId: props.userId,
   });
-  const slug = context.params?.slug;
-  if (typeof slug !== "string") {
-    throw new Error("no slug");
-  }
-  await ssg.profile.getUserByEmail.prefetch({ email: slug });
-  return { props: { trpcState: ssg.dehydrate(), email: slug } };
-};
+  if (isLoading) return <LoadingPage />;
+  if (!data || data.length === 0) return <div> No posts</div>;
 
-export const getStaticPaths = () => {
-  return { paths: [], fallback: "blocking" };
+  return (
+    <div className="flex flex-col">
+      {data.map((fullPost) => (
+        <PostView {...fullPost} key={fullPost.post.id} />
+      ))}
+    </div>
+  );
 };
 
 const ProfilePage: NextPage<{ email: string }> = ({ email }) => {
@@ -50,9 +50,28 @@ const ProfilePage: NextPage<{ email: string }> = ({ email }) => {
           <div className="text-xl font-extrabold">{data.fullName}</div>
           <div className="text-sm text-slate-500">{data.email}</div>
         </div>
+        <ProfileFeed userId={data.id} />
       </PageLayout>
     </>
   );
 };
 
 export default ProfilePage;
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  const ssg = createServerSideHelpers({
+    router: appRouter,
+    ctx: { db: db, userId: null },
+    transformer: superjson,
+  });
+  const slug = context.params?.slug;
+  if (typeof slug !== "string") {
+    throw new Error("no slug");
+  }
+  await ssg.profile.getUserByEmail.prefetch({ email: slug });
+  return { props: { trpcState: ssg.dehydrate(), email: slug } };
+};
+
+export const getStaticPaths = () => {
+  return { paths: [], fallback: "blocking" };
+};
