@@ -39,17 +39,19 @@ const ProfilePage: NextPage<{ email: string }> = ({ email }) => {
         <title>{`${data.fullName} (${data.email}) / Larry`}</title>
       </Head>
       <PageLayout>
-        <div className="flex flex-col border-b border-slate-500 p-4">
+        <div className="relative h-36  bg-slate-500">
           <Image
             src={data.imageUrl}
             alt={`${data.fullName}'s profile picture`}
-            className="rounded-full p-4"
-            width={133}
-            height={133}
+            className="absolute bottom-0 left-0 -mb-[64px] ml-4 rounded-full border-4 border-black"
+            width={128}
+            height={128}
           />
-          <div className="text-xl font-extrabold">{data.fullName}</div>
-          <div className="text-sm text-slate-500">{data.email}</div>
         </div>
+        <div className="h-[64px]" />
+        <div className="px-4 text-xl font-extrabold">{data.fullName}</div>
+        <div className="px-4 pb-4 text-sm text-slate-500">{data.email}</div>
+        <div className="w-full border-b border-slate-500" />
         <ProfileFeed userId={data.id} />
       </PageLayout>
     </>
